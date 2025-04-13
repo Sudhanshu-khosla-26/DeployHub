@@ -21,7 +21,7 @@ const prisma = new PrismaClient({})
 
 const kafka = new Kafka({
     clientId: `api-server`,
-    brokers: [''],
+    brokers: ['kafka-c07330e-work-cd02.l.aivencloud.com:13365'],
     ssl: {
         ca: [fs.readFileSync(path.join(__dirname, 'kafka.pem'), 'utf-8')],
     },
@@ -36,7 +36,7 @@ const kafka = new Kafka({
 const io = new Server({ cors: '*' })
 
 const client = createClient({
-    host: "",
+    host: "https://avnadmin:AVNS_-RljWTX5rcxfgE0RXCn@clickhouse-22f3b8e3-work-cd02.l.aivencloud.com:13353",
     database: "default",
     username: "avnadmin",
     password: ""
