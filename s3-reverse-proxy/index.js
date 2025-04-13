@@ -5,6 +5,7 @@ const app = express();
 const BASE_PATH = `https://s3.eu-north-1.amazonaws.com/vercel-clone-2.0/__outputs`;
 const PORT = process.env.PORT || 8000;
 const proxy = httpProxy.createProxy();
+let framework;
 
 // Health check endpoint for Render
 app.get('/health', (req, res) => res.send('OK'));
@@ -24,12 +25,10 @@ app.use(async (req, res) => {
         });
 
         const result = await response.json();
-        const framework = result.data.framework;
+     framework = result.data.framework;
         const resolveto = `${BASE_PATH}/${result.data.projectId}`;
 
         console.log(`Proxying to: ${resolveto}`);
-
-        req.framework = framework;
 
         proxy.web(req, res, {
             target: resolveto,
@@ -46,7 +45,7 @@ app.use(async (req, res) => {
 proxy.on('proxyReq', (proxyReq, req, res) => {
     const url = req.url;
 
-    if (req.framework === 'angular.js') {
+    if (framework === 'angular.js') {
         proxyReq.path += 'browser/index.html';
     } else if (url === '/') {
         proxyReq.path += 'index.html';
