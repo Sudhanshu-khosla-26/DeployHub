@@ -1,61 +1,59 @@
 const express = require('express');
 const httpProxy = require('http-proxy');
 
+
 const app = express();
-const PORT = process.env.PORT || 8000;
-
-const BASE_S3_URL = 'https://s3.eu-north-1.amazonaws.com/vercel-clone-2.0/__outputs';
-const BACKEND_API_URL = 'https://deployhub-7s0l.onrender.com/getprojectid';
-
+const BASE_PATH = `https://s3.eu-north-1.amazonaws.com/vercel-clone-2.0/__outputs`
+const PORT = 8000;
 const proxy = httpProxy.createProxy();
+let framework;
 
 app.use(async (req, res) => {
-    try {
-        const hostname = req.hostname;
-        const subdomain = hostname.split('.')[0];
+    const hostname = req.hostname;
+    const subdomain = hostname.split(".")[0];
 
-        const response = await fetch(BACKEND_API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ name: subdomain }),
-        });
+    fetch("http://localhost:9000/getprojectid", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        redirect: "follow",
+        body: JSON.stringify({ name: subdomain }),
+    }).then((data) => {
+        console.log(data);
 
-        const result = await response.json();
+        return data.json()
+    }).then((result) => {
+        console.log(result.data.framework, "result");
+        framework = result.data.framework;
+        const resolveto = `${BASE_PATH}/${result.data.projectId}`;
 
-        if (!result?.data?.projectId) {
-            return res.status(404).json({ error: 'Project not found' });
-        }
+        // for angular projectname/browser/index.html
 
-        const framework = result.data.framework;
-        const projectId = result.data.projectId;
-        const target = `${BASE_S3_URL}/${projectId}`;
+        return proxy.web(req, res, { target: resolveto, changeOrigin: true });
+    })
+        .catch((err) => {
+            console.log(err)
+            return res.status(500).json({ error: 'Error fetching project id' })
+        })
+})
 
-        // For Angular, proxy to index.html directly
-        if (framework === 'angular.js') {
-            return res.redirect(`${target}/browser/index.html`);
-        }
+console.log(framework, "framework");
 
-        // For others, default index.html or asset
-        return proxy.web(req, res, {
-            target,
-            changeOrigin: true,
-            secure: true,
-        });
-
-    } catch (err) {
-        console.error('[Proxy Error]', err);
-        return res.status(500).json({ error: 'Proxy server error' });
+proxy.on('proxyReq', (proxyReq, req, res) => {
+    const url = req.url;
+    if (framework === 'angular.js') {
+        proxyReq.path += `browser/index.html`;
     }
-});
+    else if (url === '/') {
+        proxyReq.path += 'index.html';
+    }
 
-// Proxy Error Handling
-proxy.on('error', (err, req, res) => {
-    console.error('[Proxy Internal Error]', err);
-    res.status(500).json({ error: 'Internal proxy error' });
-});
+    return proxyReq;
+
+})
 
 app.listen(PORT, () => {
-    console.log(`🚀 Reverse Proxy running on port ${PORT}`);
-});
+    console.log(`Reverse Proxy Running...${PORT}`);
+})
+
