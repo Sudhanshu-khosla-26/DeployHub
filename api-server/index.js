@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const { generateSlug } = require('random-word-slugs')
 const { ECSClient, RunTaskCommand } = require('@aws-sdk/client-ecs')
@@ -20,27 +21,29 @@ const PORT = 9000;
 const prisma = new PrismaClient({})
 
 const kafka = new Kafka({
-    clientId: `api-server`,
-    brokers: ['kafka-c07330e-work-cd02.l.aivencloud.com:13365'],
+    clientId: 'api-server',
+    brokers: [process.env.KAFKA_BROKER],
     ssl: {
-        ca: [fs.readFileSync(path.join(__dirname, 'kafka.pem'), 'utf-8')],
+        ca: [fs.readFileSync(path.join(__dirname, process.env.KAFKA_CA_PATH), 'utf-8')],
     },
     sasl: {
-        username: 'avnadmin',
-        password: '',
+        username: process.env.KAFKA_USERNAME,
+        password: process.env.KAFKA_PASSWORD,
         mechanism: 'plain'
     }
-})
+});
+
 
 // const subscriber = new Redis('rediss://default:AVNS_icn3U0uU4ZTPOoU1kob@valkey-1e8ec864-sudhanshukhosla123-4997.c.aivencloud.com:20982')
 const io = new Server({ cors: '*' })
 
 const client = createClient({
-    host: "https://avnadmin:AVNS_-RljWTX5rcxfgE0RXCn@clickhouse-22f3b8e3-work-cd02.l.aivencloud.com:13353",
+    host: `https://${process.env.CLICKHOUSE_USER}:${process.env.CLICKHOUSE_PASSWORD}@${process.env.CLICKHOUSE_HOST}`,
     database: "default",
-    username: "avnadmin",
-    password: ""
-})
+    username: process.env.CLICKHOUSE_USER,
+    password: process.env.CLICKHOUSE_PASSWORD
+});
+
 
 const consumer = kafka.consumer({
     groupId: 'api-server-logs-consumer',
@@ -57,17 +60,19 @@ const consumer = kafka.consumer({
 // })
 
 const ecsClient = new ECSClient({
-    region: 'eu-north-1',
+    region: process.env.AWS_REGION,
     credentials: {
-        accessKeyId: '',
-        secretAccessKey: ''
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
     }
-})
+});
+
 
 const config = {
-    CLUSTER: ``,
-    TASK: ``
-}
+    CLUSTER: process.env.ECS_CLUSTER,
+    TASK: process.env.ECS_TASK
+};
+
 
 app.use(cors({ origin: '*' }))
 app.use(express.json());
@@ -111,12 +116,13 @@ app.post("/auth/github/callback", async (req, res) => {
         const tokenResponse = await axios.post(
             "https://github.com/login/oauth/access_token",
             {
-                client_id: "",
-                client_secret: "",
+                client_id: process.env.GITHUB_CLIENT_ID,
+                client_secret: process.env.GITHUB_CLIENT_SECRET,
                 code,
             },
             { headers: { Accept: "application/json" } }
         );
+
 
         const accessToken = tokenResponse.data.access_token;
         if (!accessToken) {
@@ -334,8 +340,8 @@ app.post('/deploy', async (req, res) => {
         networkConfiguration: {
             awsvpcConfiguration: {
                 assignPublicIp: 'ENABLED',
-                subnets: ['subnet-', 'subnet-', 'subnet-'],
-                securityGroups: ['sg-'],
+                subnets: ['subnet-03c0f3acd82a51cd9', 'subnet-0cad6e3a92a7661a3', 'subnet-0af6c6d6fadd727e7'],
+                securityGroups: ['sg-0b0c0bb960eb02737'],
             }
         },
         overrides: {

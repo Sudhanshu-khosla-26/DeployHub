@@ -26,7 +26,7 @@ model User {
   id String @id @unique
   firstName String
   lastName String
-  email String @unique
+  email String? @unique 
   picture String?
   Project Project[]
 }
@@ -34,11 +34,12 @@ model User {
 
 model Project {
     id String @id @default(uuid())
-    name String
+    name String @unique
     gitURL String @map("git_url")
-    subDomain String @map("sub_doamin")
+    subDomain String @map("sub_domain")
     customDomain String? @map("custom_domain")
     createdBy String @map("created_by") 
+    framework String @map("framework") @default("React.js")
     user User @relation(fields: [createdBy], references: [id])
     Deployment Deployment[]
     createdAt DateTime @default(now())
@@ -47,8 +48,8 @@ model Project {
 
 model Deployment {
   id String @id @default(uuid())
-  project Project @relation(fields: [ProjectId], references: [id])
   ProjectId String @map("project_id")
+  project Project @relation(fields: [ProjectId], references: [id])
   status DeploymentStatus @default(NOT_STARTED)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
