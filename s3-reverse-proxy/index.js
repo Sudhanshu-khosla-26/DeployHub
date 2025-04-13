@@ -12,7 +12,7 @@ app.use(async (req, res) => {
     const hostname = req.hostname;
     const subdomain = hostname.split(".")[0];
 
-    fetch("http://localhost:9000/getprojectid", {
+    fetch("https://deployhub-7s0l.onrender.com/getprojectid", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
