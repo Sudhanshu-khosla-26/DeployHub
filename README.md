@@ -4,7 +4,7 @@ DeployHub is a full-stack deployment platform inspired by Vercel. It lets users 
 
 ## Workflow Overview
 
-![DeployHub Workflow](./68747470733a2f2f692e696d6775722e636f6d2f7237515558715a2e706e67.png)
+![DeployHub Workflow](./docs/workflow.png)
 
 ## How DeployHub Works
 
@@ -56,26 +56,34 @@ DeployHub is a full-stack deployment platform inspired by Vercel. It lets users 
 ### Install Dependencies
 
 ```bash
-cd /home/runner/work/DeployHub/DeployHub/api-server && npm install
-cd /home/runner/work/DeployHub/DeployHub/build-server && npm install
-cd /home/runner/work/DeployHub/DeployHub/s3-reverse-proxy && npm install
-cd /home/runner/work/DeployHub/DeployHub/vercel && npm install
+cd api-server
+npm install
+cd ../build-server
+npm install
+cd ../s3-reverse-proxy
+npm install
+cd ../vercel
+npm install
 ```
 
 ### Run Services
 
 ```bash
 # API server
-cd /home/runner/work/DeployHub/DeployHub/api-server && node index.js
+cd api-server
+node index.js
 
 # Build server (usually ECS task runtime)
-cd /home/runner/work/DeployHub/DeployHub/build-server && node script.js
+cd ../build-server
+node script.js
 
 # Reverse proxy
-cd /home/runner/work/DeployHub/DeployHub/s3-reverse-proxy && node index.js
+cd ../s3-reverse-proxy
+node index.js
 
 # Frontend
-cd /home/runner/work/DeployHub/DeployHub/vercel && npm run dev
+cd ../vercel
+npm run dev
 ```
 
 ## Notes
