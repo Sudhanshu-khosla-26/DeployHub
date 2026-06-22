@@ -30,7 +30,7 @@ DeployHub is a full-stack deployment platform inspired by Vercel. It lets users 
 
 ## Repository Structure
 
-- Frontend dashboard module (directory: `vercel/`) — React + Vite UI application
+- Frontend dashboard module — React + Vite UI application
 - `/api-server` — Express API for auth, projects, deployments, logs, and ECS task orchestration
 - `/build-server` — Builder runtime (clone, build, upload, log publishing)
 - `/s3-reverse-proxy` — Reverse proxy that maps subdomains to deployed S3 outputs
@@ -90,4 +90,3 @@ npm run dev
 
 - Set all required environment variables before starting services.
 - Update endpoint URLs and domain settings for non-local deployments.
-- The frontend currently contains legacy scaffold/demo sections in addition to DeployHub logic.
