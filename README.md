@@ -4,7 +4,7 @@ DeployHub is a full-stack deployment platform inspired by Vercel. It lets users 
 
 ## Workflow Overview
 
-![DeployHub Workflow](./docs/deployhub-workflow.png)
+![DeployHub Workflow](./deployhub-workflow.png)
 
 ## How DeployHub Works
 
@@ -30,7 +30,7 @@ DeployHub is a full-stack deployment platform inspired by Vercel. It lets users 
 
 ## Repository Structure
 
-- `/vercel` (frontend dashboard) — React + Vite UI application
+- Frontend dashboard module (directory: `vercel/`) — React + Vite UI application
 - `/api-server` — Express API for auth, projects, deployments, logs, and ECS task orchestration
 - `/build-server` — Builder runtime (clone, build, upload, log publishing)
 - `/s3-reverse-proxy` — Reverse proxy that maps subdomains to deployed S3 outputs
